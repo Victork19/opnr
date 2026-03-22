@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Opnr Digital — Logo Showcase</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;-webkit-font-smoothing:antialiased}
+
+:root{
+  --gold:#e8951a;
+  --gold2:#f5b040;
+  --gold3:#b86c08;
+  --glow:rgba(232,149,26,0.25);
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --mono:'DM Mono',monospace;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+
+[data-theme="dark"]{
+  --bg:#080709;
+  --bg2:#0f0d12;
+  --surf:#121119;
+  --surf2:#181622;
+  --b1:rgba(255,255,255,0.07);
+  --white:#f1efe9;
+  --w60:rgba(241,239,233,0.6);
+  --w30:rgba(241,239,233,0.3);
+  --w12:rgba(241,239,233,0.12);
+  --label-bg:rgba(232,149,26,0.07);
+  --label-border:rgba(232,149,26,0.18);
+}
+[data-theme="light"]{
+  --bg:#f5f3ee;
+  --bg2:#ece9e2;
+  --surf:#e8e5de;
+  --surf2:#dedad2;
+  --b1:rgba(0,0,0,0.10);
+  --white:#0f0d0b;
+  --w60:rgba(15,13,11,0.65);
+  --w30:rgba(15,13,11,0.40);
+  --w12:rgba(15,13,11,0.12);
+  --label-bg:rgba(184,108,8,0.07);
+  --label-border:rgba(184,108,8,0.2);
+}
+
+body{
+  background:var(--bg);
+  color:var(--white);
+  font-family:var(--serif);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:3rem 2rem 4rem;
+  transition:background .5s var(--ease), color .5s var(--ease);
+  cursor:default;
+}
+
+/* ── TOGGLE ── */
+.toggle-bar{
+  position:fixed;
+  top:1.8rem;
+  right:2rem;
+  display:flex;
+  align-items:center;
+  gap:.8rem;
+  z-index:100;
+}
+.toggle-label{
+  font-family:var(--mono);
+  font-size:.52rem;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--w30);
+  transition:color .35s;
+}
+.toggle-label.active{color:var(--white)}
+.toggle-pill{
+  position:relative;
+  width:52px;
+  height:28px;
+  background:var(--surf2);
+  border:1px solid var(--b1);
+  border-radius:99px;
+  cursor:pointer;
+  transition:background .4s var(--ease), border-color .4s;
+}
+.toggle-pill::before{
+  content:'';
+  position:absolute;
+  top:4px;
+  left:4px;
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  background:var(--gold);
+  transition:transform .38s var(--ease), box-shadow .3s;
+  box-shadow:0 2px 8px rgba(232,149,26,.35);
+}
+[data-theme="light"] .toggle-pill::before{
+  transform:translateX(24px);
+}
+
+/* ── PAGE TITLE ── */
+.page-title{
+  font-family:var(--mono);
+  font-size:.52rem;
+  letter-spacing:.28em;
+  text-transform:uppercase;
+  color:var(--w30);
+  margin-bottom:4rem;
+  text-align:center;
+  transition:color .5s;
+}
+
+/* ── LOGO GRID ── */
+.logo-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:2px;
+  width:100%;
+  max-width:960px;
+  background:var(--b1);
+}
+
+/* individual card */
+.logo-card{
+  background:var(--bg);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:2rem;
+  padding:3.5rem 2.5rem;
+  transition:background .5s var(--ease);
+  position:relative;
+}
+
+/* variant: dark bg */
+.logo-card--dark{
+  background:var(--bg2);
+}
+/* variant: gold tint */
+.logo-card--gold{
+  background:linear-gradient(135deg,rgba(232,149,26,.05),transparent 70%), var(--bg);
+}
+[data-theme="light"] .logo-card--gold{
+  background:linear-gradient(135deg,rgba(184,108,8,.06),transparent 70%), var(--bg);
+}
+/* variant: surf */
+.logo-card--surf{
+  background:var(--surf);
+}
+
+/* card label */
+.card-label{
+  position:absolute;
+  bottom:.9rem;
+  left:50%;
+  transform:translateX(-50%);
+  font-family:var(--mono);
+  font-size:.42rem;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--w30);
+  white-space:nowrap;
+  background:var(--label-bg);
+  border:1px solid var(--label-border);
+  padding:.18rem .65rem;
+  transition:color .5s, background .5s, border-color .5s;
+}
+
+/* ── THE LOGO COMPONENTS ── */
+
+/* Full primary logo: mark + wordmark */
+.logo-full{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+.logo-wordmark{
+  display:flex;
+  flex-direction:column;
+  gap:1px;
+}
+.logo-name{
+  font-family:var(--serif);
+  font-size:2.1rem;
+  font-weight:400;
+  letter-spacing:.1em;
+  color:var(--white);
+  line-height:1;
+  transition:color .5s;
+  display:flex;
+  align-items:center;
+  gap:5px;
+}
+.logo-sub{
+  font-family:var(--mono);
+  font-size:.44rem;
+  letter-spacing:.28em;
+  text-transform:uppercase;
+  color:var(--w30);
+  transition:color .5s;
+}
+
+/* Mark only (large) */
+.logo-mark-lg{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* Wordmark only */
+.logo-wordmark-only{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+}
+.logo-name-xl{
+  font-family:var(--serif);
+  font-size:3.2rem;
+  font-weight:400;
+  letter-spacing:.12em;
+  color:var(--white);
+  line-height:1;
+  transition:color .5s;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.logo-sub-xl{
+  font-family:var(--mono);
+  font-size:.46rem;
+  letter-spacing:.32em;
+  text-transform:uppercase;
+  color:var(--w30);
+  transition:color .5s;
+}
+
+/* Monochrome / inverted */
+.logo-mono{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.logo-name-mono{
+  font-family:var(--serif);
+  font-size:2rem;
+  font-weight:400;
+  letter-spacing:.1em;
+  line-height:1;
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+
+/* Gold mono version */
+.logo-gold{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.logo-name-gold{
+  font-family:var(--serif);
+  font-size:2rem;
+  font-weight:400;
+  letter-spacing:.1em;
+  color:var(--gold2);
+  line-height:1;
+  display:flex;
+  align-items:center;
+  gap:5px;
+}
+
+/* Compact / favicon size */
+.logo-compact{
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+.logo-name-sm{
+  font-family:var(--serif);
+  font-size:1rem;
+  font-weight:400;
+  letter-spacing:.08em;
+  color:var(--white);
+  transition:color .5s;
+  display:flex;
+  align-items:center;
+  gap:3px;
+}
+
+/* ─ SVG MARK helpers ─ */
+/* The portal-O mark at various sizes; colours via CSS vars */
+
+/* Wide banner (full row) */
+.logo-card--wide{
+  grid-column: 1 / -1;
+  padding:3rem 5rem;
+  flex-direction:row;
+  gap:5rem;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+.logo-card--wide .logo-full{
+  flex-direction:column;
+  align-items:center;
+  gap:1rem;
+}
+.logo-card--wide .logo-name{
+  font-size:3.8rem;
+  letter-spacing:.12em;
+}
+.logo-card--wide .logo-sub{
+  font-size:.5rem;
+  letter-spacing:.32em;
+  text-align:center;
+}
+
+/* divider row */
+.logo-card--divider{
+  grid-column:1/-1;
+  background:transparent;
+  padding:1.2rem 0 .4rem;
+  align-items:flex-start;
+  justify-content:flex-start;
+}
+.divider-label{
+  font-family:var(--mono);
+  font-size:.48rem;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:var(--w30);
+  padding-left:2px;
+  transition:color .5s;
+}
+
+/* Footer note */
+.footer-note{
+  margin-top:3rem;
+  font-family:var(--mono);
+  font-size:.48rem;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--w30);
+  text-align:center;
+  transition:color .5s;
+}
+</style>
+</head>
+<body>
+
+<!-- TOGGLE -->
+<div class="toggle-bar">
+  <span class="toggle-label active" id="lbl-dark">Dark</span>
+  <div class="toggle-pill" id="themeToggle" role="button" tabindex="0" aria-label="Toggle theme"></div>
+  <span class="toggle-label" id="lbl-light">Light</span>
+</div>
+
+<p class="page-title">Opnr Digital — Logo Suite</p>
+
+<div class="logo-grid">
+
+  <!-- ── ROW 0: HERO BANNER ── -->
+  <div class="logo-card logo-card--wide logo-card--dark">
+    <!-- Full primary — large -->
+    <div class="logo-full" style="align-items:center;gap:20px">
+      <!-- Mark XL -->
+      <svg width="72" height="72" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="18" cy="18" r="15" stroke="var(--gold3)" stroke-width="0.6" fill="none" opacity="0.45"/>
+        <circle cx="18" cy="18" r="10.5" stroke="var(--gold2)" stroke-width="0.85" fill="none" opacity="0.6"/>
+        <circle cx="18" cy="18" r="6" stroke="var(--gold)" stroke-width="1.1" fill="none"/>
+        <line x1="7" y1="18" x2="29" y2="18" stroke="var(--gold3)" stroke-width="0.55" opacity="0.35" stroke-dasharray="2 2.5"/>
+        <circle cx="18" cy="3" r="1.1" fill="var(--gold3)" opacity="0.55"/>
+        <circle cx="33" cy="18" r="1.1" fill="var(--gold)" opacity="0.75"/>
+        <circle cx="18" cy="33" r="1.1" fill="var(--gold3)" opacity="0.55"/>
+        <circle cx="3" cy="18" r="1.1" fill="var(--gold3)" opacity="0.38"/>
+        <circle cx="18" cy="18" r="2.2" fill="var(--gold)">
+          <animate attributeName="r" values="2.2;3.1;2.2" dur="3.2s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="1;0.5;1" dur="3.2s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="18" cy="18" r="1.1" fill="var(--gold2)"/>
+      </svg>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="font-family:var(--serif);font-size:4.5rem;font-weight:400;letter-spacing:.1em;color:var(--white);line-height:1;display:flex;align-items:center;gap:8px;transition:color .5s">
+          Opnr
+          <svg width="10" height="10" viewBox="0 0 8 8" fill="none">
+            <circle cx="4" cy="4" r="3.5" fill="var(--gold)">
+              <animate attributeName="opacity" values="1;0.25;1" dur="2.4s" repeatCount="indefinite"/>
+            </circle>
+          </svg>
+        </div>
+        <div style="font-family:var(--mono);font-size:.5rem;letter-spacing:.35em;text-transform:uppercase;color:var(--w30);transition:color .5s">Digital Presence Studio</div>
+      </div>
+    </div>
+    <span class="card-label">Primary Mark — Full Lockup</span>
+  </div>
+
+  <!-- ── DIVIDER ── -->
+  <div class="logo-card logo-card--divider">
+    <span class="divider-label">Mark Variations</span>
+  </div>
+
+  <!-- Card 1: Mark only — large -->
+  <div class="logo-card logo-card--dark">
+    <svg width="88" height="88" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="18" cy="18" r="15" stroke="var(--gold3)" stroke-width="0.65" fill="none" opacity="0.4"/>
+      <circle cx="18" cy="18" r="10.5" stroke="var(--gold2)" stroke-width="0.9" fill="none" opacity="0.58"/>
+      <circle cx="18" cy="18" r="6" stroke="var(--gold)" stroke-width="1.15" fill="none"/>
+      <line x1="7" y1="18" x2="29" y2="18" stroke="var(--gold3)" stroke-width="0.55" opacity="0.3" stroke-dasharray="2 2.5"/>
+      <circle cx="18" cy="3" r="1.1" fill="var(--gold3)" opacity="0.55"/>
+      <circle cx="33" cy="18" r="1.1" fill="var(--gold)" opacity="0.8"/>
+      <circle cx="18" cy="33" r="1.1" fill="var(--gold3)" opacity="0.55"/>
+      <circle cx="3" cy="18" r="1.1" fill="var(--gold3)" opacity="0.35"/>
+      <circle cx="18" cy="18" r="2.3" fill="var(--gold)">
+        <animate attributeName="r" values="2.3;3.3;2.3" dur="3.2s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="1;0.45;1" dur="3.2s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="18" cy="18" r="1.15" fill="var(--gold2)"/>
+    </svg>
+    <span class="card-label">Mark Only</span>
+  </div>
+
+  <!-- Card 2: Mark — gold glow bg -->
+  <div class="logo-card logo-card--gold">
+    <svg width="88" height="88" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- subtle outer glow ring -->
+      <circle cx="18" cy="18" r="17" stroke="var(--gold)" stroke-width="0.3" fill="none" opacity="0.1"/>
+      <circle cx="18" cy="18" r="15" stroke="var(--gold3)" stroke-width="0.65" fill="none" opacity="0.5"/>
+      <circle cx="18" cy="18" r="10.5" stroke="var(--gold2)" stroke-width="0.9" fill="none" opacity="0.65"/>
+      <circle cx="18" cy="18" r="6" stroke="var(--gold)" stroke-width="1.2" fill="none"/>
+      <line x1="7" y1="18" x2="29" y2="18" stroke="var(--gold3)" stroke-width="0.55" opacity="0.38" stroke-dasharray="2 2.5"/>
+      <circle cx="18" cy="3" r="1.1" fill="var(--gold2)" opacity="0.7"/>
+      <circle cx="33" cy="18" r="1.2" fill="var(--gold)" opacity="0.9"/>
+      <circle cx="18" cy="33" r="1.1" fill="var(--gold2)" opacity="0.7"/>
+      <circle cx="3" cy="18" r="1.1" fill="var(--gold3)" opacity="0.5"/>
+      <circle cx="18" cy="18" r="2.5" fill="var(--gold)">
+        <animate attributeName="r" values="2.5;3.5;2.5" dur="3.2s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="1;0.4;1" dur="3.2s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="18" cy="18" r="1.2" fill="var(--gold2)"/>
+    </svg>
+    <span class="card-label">Mark — Gold Accent</span>
+  </div>
+
+  <!-- Card 3: Mark — inverted / white (for dark bg) -->
+  <div class="logo-card logo-card--surf" style="background:#080709">
+    <svg width="88" height="88" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="18" cy="18" r="15" stroke="rgba(241,239,233,0.22)" stroke-width="0.65" fill="none"/>
+      <circle cx="18" cy="18" r="10.5" stroke="rgba(241,239,233,0.45)" stroke-width="0.9" fill="none"/>
+      <circle cx="18" cy="18" r="6" stroke="rgba(241,239,233,0.8)" stroke-width="1.15" fill="none"/>
+      <line x1="7" y1="18" x2="29" y2="18" stroke="rgba(241,239,233,0.18)" stroke-width="0.55" stroke-dasharray="2 2.5"/>
+      <circle cx="18" cy="3" r="1.1" fill="rgba(241,239,233,0.35)"/>
+      <circle cx="33" cy="18" r="1.1" fill="rgba(241,239,233,0.55)"/>
+      <circle cx="18" cy="33" r="1.1" fill="rgba(241,239,233,0.35)"/>
+      <circle cx="3" cy="18" r="1.1" fill="rgba(241,239,233,0.22)"/>
+      <circle cx="18" cy="18" r="2.2" fill="rgba(241,239,233,1)">
+        <animate attributeName="opacity" values="1;0.5;1" dur="3.2s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="18" cy="18" r="1.1" fill="white"/>
+    </svg>
+    <span class="card-label" style="color:rgba(241,239,233,0.28);background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.1)">Mark — White Mono</span>
+  </div>
+
+  <!-- ── DIVIDER ── -->
+  <div class="logo-card logo-card--divider">
+    <span class="divider-label">Full Lockup Variations</span>
+  </div>
+
+  <!-- Card 4: Full lockup — standard -->
+  <div class="logo-card">
+    <div class="logo-full">
+      <svg width="44" height="44" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="18" cy="18" r="15" stroke="var(--gold3)" stroke-width="0.65" fill="none" opacity="0.42"/>
+        <circle cx="18" cy="18" r="10.5" stroke="var(--gold2)" stroke-width="0.9" fill="none" opacity="0.58"/>
+        <circle cx="18" cy="18" r="6" stroke="var(--gold)" stroke-width="1.1" fill="none"/>
+        <line x1="7" y1="18" x2="29" y2="18" stroke="var(--gold3)" stroke-width="0.55" opacity="0.3" stroke-dasharray="2 2.5"/>
+        <circle cx="33" cy="18" r="1" fill="var(--gold)" opacity="0.75"/>
+        <circle cx="3" cy="18" r="1" fill="var(--gold3)" opacity="0.35"/>
+        <circle cx="18" cy="18" r="2" fill="var(--gold)">
+          <animate attributeName="r" values="2;2.8;2" dur="3.2s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="1;0.45;1" dur="3.2s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="18" cy="18" r="1" fill="var(--gold2)"/>
+      </svg>
+      <div class="logo-wordmark">
+        <div class="logo-name">
+          Opnr
+          <svg width="7" height="7" viewBox="0 0 6 6" fill="none">
+            <circle cx="3" cy="3" r="2.5" fill="var(--gold)">
+              <animate attributeName="opacity" values="1;0.25;1" dur="2.4s" repeatCount="indefinite"/>
+            </circle>
+          </svg>
+        </div>
+        <div class="logo-sub">Digital Presence Studio</div>
+      </div>
+    </div>
+    <span class="card-label">Full Lockup — Standard</span>
+  </div>
+
+  <!-- Card 5: Gold version — full lockup -->
+  <div class="logo-card logo-card--dark">
+    <div class="logo-gold">
+      <svg width="44" height="44" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="18" cy="18" r="15" stroke="var(--gold3)" stroke-width="0.65" fill="none" opacity="0.55"/>
+        <circle cx="18" cy="18" r="10.5" stroke="var(--gold2)" stroke-width="0.9" fill="none" opacity="0.7"/>
+        <circle cx="18" cy="18" r="6" stroke="var(--gold)" stroke-width="1.15" fill="none"/>
+        <line x1="7" y1="18" x2="29" y2="18" stroke="var(--gold2)" stroke-width="0.55" opacity="0.4" stroke-dasharray="2 2.5"/>
+        <circle cx="33" cy="18" r="1" fill="var(--gold2)" opacity="0.85"/>
+        <circle cx="3" cy="18" r="1" fill="var(--gold3)" opacity="0.5"/>
+        <circle cx="18" cy="18" r="2" fill="var(--gold)">
+          <animate attributeName="r" values="2;3;2" dur="3.2s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="1;0.4;1" dur="3.2s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="18" cy="18" r="1" fill="var(--gold2)"/>
+      </svg>
+      <div>
+        <div class="logo-name-gold">
+          Opnr
+          <svg width="7" height="7" viewBox="0 0 6 6" fill="none">
+            <circle cx="3" cy="3" r="2.5" fill="var(--gold2)">
+              <animate attributeName="opacity" values="1;0.2;1" dur="2.4s" repeatCount="indefinite"/>
+            </circle>
+          </svg>
+        </div>
+        <div style="font-family:var(--mono);font-size:.44rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold3);margin-top:4px">Digital Presence Studio</div>
+      </div>
+    </div>
+    <span class="card-label">Full Lockup — Gold Mono</span>
+  </div>
+
+  <!-- Card 6: Wordmark only -->
+  <div class="logo-card logo-card--surf">
+    <div class="logo-wordmark-only">
+      <div class="logo-name-xl">
+        Opnr
+        <svg width="9" height="9" viewBox="0 0 8 8" fill="none">
+          <circle cx="4" cy="4" r="3.5" fill="var(--gold)">
+            <animate attributeName="opacity" values="1;0.2;1" dur="2.4s" repeatCount="indefinite"/>
+          </circle>
+        </svg>
+      </div>
+      <div class="logo-sub-xl">Digital Presence Studio</div>
+    </div>
+    <span class="card-label">Wordmark Only</span>
+  </div>
+
+  <!-- ── DIVIDER ── -->
+  <div class="logo-card logo-card--divider">
+    <span class="divider-label">Compact & Speciality</span>
+  </div>
+
+  <!-- Card 7: Compact / nav size -->
+  <div class="logo-card">
+    <div style="display:flex;flex-direction:column;gap:2rem;align-items:center">
+      <!-- Nav bar simulation -->
+      <div style="display:flex;align-items:center;justify-content:space-between;width:100%;padding:.8rem 1.2rem;background:var(--surf2);border:1px solid var(--b1);transition:background .5s,border-color .5s">
+        <div class="logo-compact">
+          <svg width="24" height="24" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="18" cy="18" r="15" stroke="var(--gold3)" stroke-width="0.7" fill="none" opacity="0.4"/>
+            <circle cx="18" cy="18" r="10.5" stroke="var(--gold2)" stroke-width="1" fill="none" opacity="0.6"/>
+            <circle cx="18" cy="18" r="6" stroke="var(--gold)" stroke-width="1.2" fill="none"/>
+            <circle cx="18" cy="18" r="2" fill="var(--gold)"/>
+          </svg>
+          <div class="logo-name-sm">
+            Opnr
+            <svg width="5" height="5" viewBox="0 0 5 5" fill="none"><circle cx="2.5" cy="2.5" r="2.5" fill="var(--gold)"/></svg>
+          </div>
+        </div>
+        <div style="font-family:var(--mono);font-size:.38rem;letter-spacing:.14em;text-transform:uppercase;color:var(--w30)">Get your free concept ↗</div>
+      </div>
+    </div>
+    <span class="card-label">Nav Bar Context</span>
+  </div>
+
+  <!-- Card 8: Favicon / icon only (small) -->
+  <div class="logo-card logo-card--dark">
+    <div style="display:flex;align-items:flex-end;gap:2rem">
+      <!-- 64px -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:.6rem">
+        <svg width="64" height="64" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="18" cy="18" r="15" stroke="var(--gold3)" stroke-width="0.65" fill="none" opacity="0.42"/>
+          <circle cx="18" cy="18" r="10.5" stroke="var(--gold2)" stroke-width="0.9" fill="none" opacity="0.58"/>
+          <circle cx="18" cy="18" r="6" stroke="var(--gold)" stroke-width="1.15" fill="none"/>
+          <circle cx="18" cy="18" r="2.2" fill="var(--gold)"/>
+          <circle cx="18" cy="18" r="1.1" fill="var(--gold2)"/>
+        </svg>
+        <span style="font-family:var(--mono);font-size:.38rem;color:var(--w30);letter-spacing:.12em">64px</span>
+      </div>
+      <!-- 32px -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:.6rem">
+        <svg width="32" height="32" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="18" cy="18" r="15" stroke="var(--gold3)" stroke-width="0.65" fill="none" opacity="0.42"/>
+          <circle cx="18" cy="18" r="10.5" stroke="var(--gold2)" stroke-width="0.9" fill="none" opacity="0.58"/>
+          <circle cx="18" cy="18" r="6" stroke="var(--gold)" stroke-width="1.15" fill="none"/>
+          <circle cx="18" cy="18" r="2.2" fill="var(--gold)"/>
+        </svg>
+        <span style="font-family:var(--mono);font-size:.38rem;color:var(--w30);letter-spacing:.12em">32px</span>
+      </div>
+      <!-- 16px -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:.6rem">
+        <svg width="16" height="16" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="18" cy="18" r="14.5" stroke="var(--gold3)" stroke-width="1.2" fill="none" opacity="0.5"/>
+          <circle cx="18" cy="18" r="10" stroke="var(--gold2)" stroke-width="1.5" fill="none" opacity="0.65"/>
+          <circle cx="18" cy="18" r="5.5" stroke="var(--gold)" stroke-width="2" fill="none"/>
+          <circle cx="18" cy="18" r="2.8" fill="var(--gold)"/>
+        </svg>
+        <span style="font-family:var(--mono);font-size:.38rem;color:var(--w30);letter-spacing:.12em">16px</span>
+      </div>
+    </div>
+    <span class="card-label">Icon Sizes</span>
+  </div>
+
+  <!-- Card 9: Light background version -->
+  <div class="logo-card" style="background:#f5f3ee">
+    <div class="logo-full">
+      <svg width="44" height="44" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="18" cy="18" r="15" stroke="var(--gold3)" stroke-width="0.65" fill="none" opacity="0.55"/>
+        <circle cx="18" cy="18" r="10.5" stroke="var(--gold2)" stroke-width="0.9" fill="none" opacity="0.7"/>
+        <circle cx="18" cy="18" r="6" stroke="var(--gold)" stroke-width="1.2" fill="none"/>
+        <line x1="7" y1="18" x2="29" y2="18" stroke="var(--gold3)" stroke-width="0.55" opacity="0.4" stroke-dasharray="2 2.5"/>
+        <circle cx="33" cy="18" r="1" fill="var(--gold)" opacity="0.85"/>
+        <circle cx="3" cy="18" r="1" fill="var(--gold3)" opacity="0.5"/>
+        <circle cx="18" cy="18" r="2.1" fill="var(--gold)"/>
+        <circle cx="18" cy="18" r="1.05" fill="var(--gold2)"/>
+      </svg>
+      <div class="logo-wordmark">
+        <div style="font-family:var(--serif);font-size:2.1rem;font-weight:400;letter-spacing:.1em;color:#0f0d0b;line-height:1;display:flex;align-items:center;gap:5px">
+          Opnr
+          <svg width="7" height="7" viewBox="0 0 6 6" fill="none">
+            <circle cx="3" cy="3" r="2.5" fill="var(--gold)"/>
+          </svg>
+        </div>
+        <div style="font-family:var(--mono);font-size:.44rem;letter-spacing:.28em;text-transform:uppercase;color:rgba(15,13,11,0.38);margin-top:3px">Digital Presence Studio</div>
+      </div>
+    </div>
+    <span class="card-label" style="color:rgba(15,13,11,0.35);background:rgba(184,108,8,0.06);border-color:rgba(184,108,8,0.18)">Full Lockup — Light Bg</span>
+  </div>
+
+  <!-- ── DIVIDER ── -->
+  <div class="logo-card logo-card--divider">
+    <span class="divider-label">Mark Concept — Anatomy</span>
+  </div>
+
+  <!-- Card 10: Annotated mark — full width -->
+  <div class="logo-card logo-card--wide logo-card--dark" style="gap:3rem;padding:3.5rem 4rem">
+    <svg width="140" height="140" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="18" cy="18" r="15" stroke="var(--gold3)" stroke-width="0.65" fill="none" opacity="0.42"/>
+      <circle cx="18" cy="18" r="10.5" stroke="var(--gold2)" stroke-width="0.9" fill="none" opacity="0.6"/>
+      <circle cx="18" cy="18" r="6" stroke="var(--gold)" stroke-width="1.1" fill="none"/>
+      <line x1="7" y1="18" x2="29" y2="18" stroke="var(--gold3)" stroke-width="0.55" opacity="0.35" stroke-dasharray="2 2.5"/>
+      <circle cx="18" cy="3" r="1.1" fill="var(--gold3)" opacity="0.55"/>
+      <circle cx="33" cy="18" r="1.2" fill="var(--gold)" opacity="0.8"/>
+      <circle cx="18" cy="33" r="1.1" fill="var(--gold3)" opacity="0.55"/>
+      <circle cx="3" cy="18" r="1.1" fill="var(--gold3)" opacity="0.38"/>
+      <circle cx="18" cy="18" r="2.4" fill="var(--gold)">
+        <animate attributeName="r" values="2.4;3.4;2.4" dur="3.2s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="1;0.4;1" dur="3.2s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="18" cy="18" r="1.2" fill="var(--gold2)"/>
+    </svg>
+    <!-- Annotation text -->
+    <div style="display:flex;flex-direction:column;gap:1.1rem;max-width:340px">
+      <div style="display:flex;align-items:flex-start;gap:.8rem">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="flex-shrink:0;margin-top:2px">
+          <circle cx="6" cy="6" r="5" stroke="var(--gold3)" stroke-width="0.8" fill="none" opacity="0.4"/>
+        </svg>
+        <div>
+          <div style="font-family:var(--mono);font-size:.44rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold3);margin-bottom:2px">Outer Ring</div>
+          <div style="font-family:var(--serif);font-size:.82rem;color:var(--w60);line-height:1.6">Permanence — the boundary of digital ownership, enduring and complete.</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:.8rem">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="flex-shrink:0;margin-top:2px">
+          <circle cx="6" cy="6" r="3.5" stroke="var(--gold2)" stroke-width="0.8" fill="none" opacity="0.6"/>
+        </svg>
+        <div>
+          <div style="font-family:var(--mono);font-size:.44rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold3);margin-bottom:2px">Mid Ring</div>
+          <div style="font-family:var(--serif);font-size:.82rem;color:var(--w60);line-height:1.6">Infrastructure — the architectural layer supporting everything built above it.</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:.8rem">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="flex-shrink:0;margin-top:2px">
+          <circle cx="6" cy="6" r="2" stroke="var(--gold)" stroke-width="1" fill="none"/>
+        </svg>
+        <div>
+          <div style="font-family:var(--mono);font-size:.44rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold3);margin-bottom:2px">Inner Aperture</div>
+          <div style="font-family:var(--serif);font-size:.82rem;color:var(--w60);line-height:1.6">Opening — the portal that "Opnr" references. The moment a business opens its permanent presence.</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:.8rem">
+        <div style="width:12px;height:1px;background:var(--gold3);opacity:.4;margin-top:7px;flex-shrink:0"></div>
+        <div>
+          <div style="font-family:var(--mono);font-size:.44rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold3);margin-bottom:2px">Horizon Line</div>
+          <div style="font-family:var(--serif);font-size:.82rem;color:var(--w60);line-height:1.6">Forward growth — a visual axis representing the path from temporary to permanent.</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:.8rem">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="flex-shrink:0;margin-top:2px">
+          <circle cx="6" cy="6" r="2.2" fill="var(--gold)" opacity="0.9"/>
+        </svg>
+        <div>
+          <div style="font-family:var(--mono);font-size:.44rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold3);margin-bottom:2px">Central Core</div>
+          <div style="font-family:var(--serif);font-size:.82rem;color:var(--w60);line-height:1.6">The single glowing accent — the heart of the presence. Pulses subtly to suggest life and activity.</div>
+        </div>
+      </div>
+    </div>
+    <span class="card-label">Mark Anatomy</span>
+  </div>
+
+</div>
+
+<p class="footer-note">Toggle dark / light above · All animations are SVG-native · Colours via CSS variables</p>
+
+<script>
+const html = document.documentElement;
+const pill = document.getElementById('themeToggle');
+const lblDark = document.getElementById('lbl-dark');
+const lblLight = document.getElementById('lbl-light');
+
+function setTheme(t) {
+  html.setAttribute('data-theme', t);
+  localStorage.setItem('opnr-logo-theme', t);
+  lblDark.classList.toggle('active', t === 'dark');
+  lblLight.classList.toggle('active', t === 'light');
+}
+
+// init
+const saved = localStorage.getItem('opnr-logo-theme') || 'dark';
+setTheme(saved);
+
+pill.addEventListener('click', () => {
+  const cur = html.getAttribute('data-theme');
+  setTheme(cur === 'dark' ? 'light' : 'dark');
+});
+pill.addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') pill.click();
+});
+</script>
+</body>
+</html>
