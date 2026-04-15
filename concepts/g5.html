@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opnr | Brutalist Radiance</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700&family=Syncopate:wght@400;700&display=swap" rel="stylesheet"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <style>
+        :root {
+            --bg: #000000;
+            --white: #ffffff;
+            --accent: #ff003c;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            overflow: hidden;
+            background-color: var(--bg);
+            color: var(--white);
+            font-family: 'Space Grotesk', sans-serif;
+            cursor: none;
+        }
+
+        #canvas-container {
+            position: absolute; inset: 0;
+            z-index: 1;
+        }
+
+        /* Brutalist Interface */
+        .interface {
+            position: absolute; inset: 0;
+            z-index: 10;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Syncopate', sans-serif;
+            font-size: 0.7rem;
+            letter-spacing: 0.5em;
+            text-transform: uppercase;
+        }
+
+        .main-stage {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .title-wrap {
+            text-align: center;
+            mix-blend-mode: difference;
+        }
+
+        .title {
+            font-family: 'Syncopate', sans-serif;
+            font-weight: 700;
+            font-size: clamp(4rem, 15vw, 15rem);
+            line-height: 0.8;
+            margin: 0;
+            letter-spacing: -0.05em;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            font-size: 0.8rem;
+            letter-spacing: 1.2em;
+            text-transform: uppercase;
+            margin-top: 20px;
+            opacity: 0.5;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            font-family: 'Syncopate', sans-serif;
+            font-size: 0.6rem;
+            letter-spacing: 0.3em;
+        }
+
+        .btn-core {
+            pointer-events: auto;
+            background: var(--white);
+            color: black;
+            border: none;
+            padding: 25px 60px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5em;
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .btn-core:hover {
+            transform: scale(1.05) skewX(-5deg);
+        }
+
+        /* Post-Processing Effects */
+        .film-grain {
+            position: fixed; inset: 0;
+            background: url('https://grainy-gradients.vercel.app/noise.svg');
+            opacity: 0.1;
+            pointer-events: none;
+            z-index: 20;
+            mix-blend-mode: overlay;
+        }
+
+        .vignette {
+            position: fixed; inset: 0;
+            background: radial-gradient(circle at center, transparent 20%, rgba(0,0,0,1) 100%);
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        #cursor {
+            width: 10px; height: 10px;
+            background: white;
+            position: fixed;
+            pointer-events: none;
+            z-index: 1000;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: difference;
+        }
+
+        #cursor-follower {
+            width: 60px; height: 60px;
+            border: 1px solid white;
+            position: fixed;
+            pointer-events: none;
+            z-index: 999;
+            transform: translate(-50%, -50%);
+            transition: all 0.1s ease-out;
+        }
+    </style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-follower"></div>
+<div class="film-grain"></div>
+<div class="vignette"></div>
+
+<div id="canvas-container"></div>
+
+<div class="interface">
+    <div class="header">
+        <div>SYSTEM // OPNR_04</div>
+        <div>STABLE_VOID</div>
+    </div>
+
+    <div class="main-stage">
+        <div class="title-wrap">
+            <h1 class="title">BRUTAL</h1>
+            <div class="subtitle">Elegance in Entropy</div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div>
+            COORD: <span id="valX">0</span> / <span id="valY">0</span><br>
+            STATUS: RADIATING
+        </div>
+        <button class="btn-core" id="trigger">Ignite</button>
+    </div>
+</div>
+
+<script>
+    let scene, camera, renderer, slabs = [], pointLight;
+    let targetMouse = new THREE.Vector2(0, 0);
+    let currentMouse = new THREE.Vector2(0, 0);
+    const clock = new THREE.Clock();
+
+    function init() {
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 45;
+
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.2;
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        // Heavy Direct Lighting
+        pointLight = new THREE.PointLight(0xffffff, 15, 100);
+        pointLight.position.set(0, 0, 10);
+        scene.add(pointLight);
+
+        const sideLight = new THREE.DirectionalLight(0xffffff, 2);
+        sideLight.position.set(10, 10, 10);
+        scene.add(sideLight);
+
+        // The Glass Slabs (Brutalist Architecture)
+        const count = 18;
+        const glassMat = new THREE.MeshPhysicalMaterial({
+            color: 0xffffff,
+            metalness: 0.1,
+            roughness: 0.0,
+            transmission: 1.0,
+            thickness: 4,
+            ior: 2.4, // Diamond-like refraction
+            reflectivity: 0.8,
+            iridescence: 1.0,
+            iridescenceIOR: 1.5,
+            clearcoat: 1.0,
+            transparent: true,
+            opacity: 0.9
+        });
+
+        for(let i = 0; i < count; i++) {
+            const w = 4 + Math.random() * 8;
+            const h = 0.5 + Math.random() * 1.5;
+            const d = 2 + Math.random() * 4;
+            
+            const geo = new THREE.BoxGeometry(w, h, d);
+            const mesh = new THREE.Mesh(geo, glassMat);
+            
+            // Random orbital start
+            const radius = 5 + Math.random() * 10;
+            const angle = Math.random() * Math.PI * 2;
+            
+            mesh.position.set(
+                Math.cos(angle) * radius,
+                Math.sin(angle) * radius,
+                (Math.random() - 0.5) * 15
+            );
+            
+            mesh.rotation.set(Math.random(), Math.random(), Math.random());
+            
+            mesh.userData = {
+                angle: angle,
+                radius: radius,
+                speed: 0.1 + Math.random() * 0.2,
+                rotSpeed: (Math.random() - 0.5) * 0.01
+            };
+            
+            slabs.push(mesh);
+            scene.add(mesh);
+        }
+
+        window.addEventListener('resize', onResize);
+        document.addEventListener('mousemove', (e) => {
+            targetMouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            targetMouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            
+            gsap.to('#cursor', { left: e.clientX, top: e.clientY, duration: 0.1 });
+            gsap.to('#cursor-follower', { left: e.clientX, top: e.clientY, duration: 0.3 });
+            
+            document.getElementById('valX').innerText = targetMouse.x.toFixed(2);
+            document.getElementById('valY').innerText = targetMouse.y.toFixed(2);
+        });
+
+        animate();
+    }
+
+    function onResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        const t = clock.getElapsedTime();
+        currentMouse.lerp(targetMouse, 0.05);
+
+        slabs.forEach((m, i) => {
+            // Heavy, slow orbital movement
+            m.userData.angle += m.userData.speed * 0.01;
+            const r = m.userData.radius + Math.sin(t * 0.2 + i) * 2;
+            
+            const tx = Math.cos(m.userData.angle) * r;
+            const ty = Math.sin(m.userData.angle) * r;
+            
+            // Mouse Focus (Slabs turn to face the light at the cursor)
+            const mouse3D = new THREE.Vector3(currentMouse.x * 20, currentMouse.y * 20, 10);
+            m.lookAt(mouse3D);
+            
+            m.position.x += (tx - m.position.x) * 0.01;
+            m.position.y += (ty - m.position.y) * 0.01;
+            m.position.z += Math.sin(t + i) * 0.02;
+
+            // Chromatic shift based on mouse
+            m.material.iridescence = Math.abs(currentMouse.x);
+        });
+
+        // Camera Dynamics
+        camera.position.x += (currentMouse.x * 10 - camera.position.x) * 0.02;
+        camera.position.y += (-currentMouse.y * 10 - camera.position.y) * 0.02;
+        camera.lookAt(0,0,0);
+        
+        // Point light follows mouse for interactive highlights
+        pointLight.position.x = currentMouse.x * 25;
+        pointLight.position.y = currentMouse.y * 25;
+
+        renderer.render(scene, camera);
+    }
+
+    document.getElementById('trigger').addEventListener('click', function() {
+        const tl = gsap.timeline();
+        this.style.pointerEvents = "none";
+        
+        tl.to(slabs.map(s => s.scale), {
+            x: 0.01, y: 10, z: 0.01,
+            duration: 1.5,
+            ease: "expo.inOut",
+            stagger: 0.02
+        })
+        .to(camera.position, { z: 20, duration: 1.5, ease: "expo.inOut" }, 0)
+        .set("body", { backgroundColor: "white" })
+        .set(".title", { color: "black", mixBlendMode: "normal" })
+        .to("body", { backgroundColor: "black", duration: 1 })
+        .add(() => {
+            slabs.forEach(s => {
+                s.scale.set(1, 1, 1);
+                s.userData.radius *= 1.5;
+            });
+            this.innerText = "RESONATED";
+        })
+        .to(camera.position, { z: 45, duration: 2, ease: "power4.out" });
+    });
+
+    window.onload = init;
+</script>
+
+</body>
+</html>

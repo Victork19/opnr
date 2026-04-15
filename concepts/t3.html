@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opnr | Obsidian Singularity</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;900&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <style>
+        :root {
+            --accent: #e5c100;
+            --dim: rgba(229, 193, 0, 0.2);
+            --bg: #000000;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            overflow: hidden;
+            background-color: var(--bg);
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            cursor: none;
+        }
+
+        #canvas-container {
+            position: absolute; inset: 0;
+            z-index: 1;
+            filter: contrast(110%) brightness(95%);
+        }
+
+        /* Technical Blueprint HUD */
+        .interface {
+            position: absolute; inset: 0;
+            z-index: 10;
+            pointer-events: none;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            padding: 4vw;
+        }
+
+        .hud-box {
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .telemetry-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.4em;
+            color: var(--accent);
+            text-transform: uppercase;
+            opacity: 0.5;
+        }
+
+        .hero-title {
+            grid-column: 1 / span 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            pointer-events: none;
+        }
+
+        .title-top {
+            font-size: 15vw;
+            font-weight: 900;
+            line-height: 0.75;
+            margin: 0;
+            letter-spacing: -0.07em;
+            text-transform: uppercase;
+            color: white;
+            mix-blend-mode: exclusion;
+        }
+
+        .manifesto-block {
+            margin-top: 30px;
+            max-width: 350px;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.75rem;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Sophisticated Button */
+        .action-area {
+            grid-row: 2;
+            grid-column: 2;
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-end;
+        }
+
+        .btn-genesis {
+            pointer-events: auto;
+            background: none;
+            border: 1px solid white;
+            padding: 30px 60px;
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 200;
+            text-transform: uppercase;
+            letter-spacing: 0.5em;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+
+        .btn-genesis:hover {
+            background: white;
+            color: black;
+            padding-right: 80px;
+        }
+
+        /* Film Grain & Chromatic Aberration */
+        .overlay {
+            position: fixed; inset: 0;
+            pointer-events: none;
+            z-index: 50;
+            background: radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.8) 100%);
+        }
+
+        .grain-layer {
+            position: fixed; inset: 0;
+            background: url('https://grainy-gradients.vercel.app/noise.svg');
+            opacity: 0.05;
+            z-index: 51;
+            pointer-events: none;
+        }
+
+        /* Cursor */
+        #c-ring {
+            width: 40px; height: 40px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body>
+
+<div id="c-ring"></div>
+<div class="overlay"></div>
+<div class="grain-layer"></div>
+
+<div id="canvas-container"></div>
+
+<div class="interface">
+    <div class="hud-box" style="border-right: none; border-bottom: none;">
+        <div>
+            <div class="telemetry-label">Orbital_Dynamics</div>
+            <div id="coords" style="font-family: 'DM Mono'; font-size: 0.6rem; margin-top: 5px;">X:00.00 Y:00.00 Z:00.00</div>
+        </div>
+        <div class="telemetry-label" style="opacity: 0.2;">// ARCHITECTURAL_RESONANCE</div>
+    </div>
+    
+    <div class="hud-box" style="border-bottom: none; align-items: flex-end;">
+        <div class="telemetry-label">Genesis_Block_v9</div>
+        <div style="font-family: 'DM Mono'; font-size: 0.6rem; text-align: right;">
+            STATUS: <span id="pulse-status" style="color: var(--accent)">STABLE</span><br>
+            LOAD: 0.00041ms
+        </div>
+    </div>
+
+    <div class="hero-title">
+        <h1 class="title-top">OBSIDIAN</h1>
+        <div class="manifesto-block">
+            WE BUILD DIGITAL ASSETS FOR THE TOP 0.1%. <br>
+            NO PLATFORMS. NO LIMITS. <br>
+            TOTAL ARCHITECTURAL SOVEREIGNTY.
+        </div>
+    </div>
+
+    <div class="action-area">
+        <button class="btn-genesis" id="btnMain">Initialize Genesis</button>
+    </div>
+</div>
+
+<script>
+    let scene, camera, renderer, core, dust, wires;
+    let targetX = 0, targetY = 0;
+    const clock = new THREE.Clock();
+
+    function init() {
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 18;
+
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.toneMapping = THREE.ReinhardToneMapping;
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        // Studio Lighting
+        const lightA = new THREE.SpotLight(0xffffff, 2, 100, 0.5, 1);
+        lightA.position.set(10, 20, 10);
+        scene.add(lightA);
+
+        const lightB = new THREE.PointLight(0xe5c100, 5, 20);
+        lightB.position.set(-10, -5, 5);
+        scene.add(lightB);
+
+        // The Core: Exploded Obsidian Icosahedron
+        const coreGroup = new THREE.Group();
+        const baseGeo = new THREE.IcosahedronGeometry(4, 3);
+        const coreMat = new THREE.MeshPhysicalMaterial({
+            color: 0x000000,
+            metalness: 0.9,
+            roughness: 0.05,
+            transmission: 0.5,
+            thickness: 2,
+            envMapIntensity: 1,
+            clearcoat: 1,
+            emissive: 0xe5c100,
+            emissiveIntensity: 0.02
+        });
+
+        core = new THREE.Mesh(baseGeo, coreMat);
+        core.userData.originalVertices = baseGeo.attributes.position.array.slice();
+        scene.add(core);
+
+        // Neural Dust (12,000 particles)
+        const dGeo = new THREE.BufferGeometry();
+        const dCount = 12000;
+        const dPos = new Float32Array(dCount * 3);
+        const dScales = new Float32Array(dCount);
+
+        for(let i = 0; i < dCount; i++) {
+            const r = 6 + Math.random() * 4;
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.acos((Math.random() * 2) - 1);
+            
+            dPos[i*3] = r * Math.sin(phi) * Math.cos(theta);
+            dPos[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
+            dPos[i*3+2] = r * Math.cos(phi);
+            dScales[i] = Math.random();
+        }
+
+        dGeo.setAttribute('position', new THREE.BufferAttribute(dPos, 3));
+        dGeo.setAttribute('scale', new THREE.BufferAttribute(dScales, 1));
+
+        const dMat = new THREE.PointsMaterial({
+            size: 0.02,
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.4,
+            blending: THREE.AdditiveBlending
+        });
+
+        dust = new THREE.Points(dGeo, dMat);
+        scene.add(dust);
+
+        window.addEventListener('resize', onResize);
+        document.addEventListener('mousemove', onMove);
+        
+        animate();
+    }
+
+    function onMove(e) {
+        targetX = (e.clientX / window.innerWidth) * 2 - 1;
+        targetY = -(e.clientY / window.innerHeight) * 2 + 1;
+        
+        gsap.to('#c-ring', { left: e.clientX, top: e.clientY, duration: 0.6, ease: "power3.out" });
+        
+        document.getElementById('coords').innerText = `X:${e.clientX} Y:${e.clientY} Z:${(Math.random()*100).toFixed(2)}`;
+    }
+
+    function onResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        const t = clock.getElapsedTime();
+
+        // Organic Core Manipulation
+        const pos = core.geometry.attributes.position;
+        const orig = core.userData.originalVertices;
+        
+        for(let i = 0; i < pos.count; i++) {
+            const i3 = i * 3;
+            const x = orig[i3];
+            const y = orig[i3+1];
+            const z = orig[i3+2];
+
+            const wave = Math.sin(t * 0.4 + x) * Math.cos(t * 0.3 + y) * 0.4;
+            const dist = Math.sqrt(x*x + y*y + z*z);
+            const factor = 1 + wave;
+
+            pos.array[i3] = x * factor + (targetX * 0.5);
+            pos.array[i3+1] = y * factor + (targetY * 0.5);
+            pos.array[i3+2] = z * factor;
+        }
+        pos.needsUpdate = true;
+
+        // Subtle kinetic float
+        core.rotation.y += 0.001;
+        core.rotation.x += 0.0005;
+
+        dust.rotation.y -= 0.0002;
+        dust.rotation.z += 0.0001;
+
+        // Dynamic Camera
+        camera.position.x += (targetX * 3 - camera.position.x) * 0.03;
+        camera.position.y += (-targetY * 3 - camera.position.y) * 0.03;
+        camera.lookAt(0,0,0);
+
+        renderer.render(scene, camera);
+        
+        if(Math.random() > 0.99) {
+            document.getElementById('pulse-status').innerText = Math.random() > 0.5 ? "RESONATING" : "STABLE";
+        }
+    }
+
+    // Genesis Cinematic
+    document.getElementById('btnMain').addEventListener('click', function() {
+        const tl = gsap.timeline();
+        this.disabled = true;
+
+        tl.to(camera.position, { z: 5, duration: 1.5, ease: "expo.inOut" })
+          .to(core.scale, { x: 0.05, y: 0.05, z: 0.05, duration: 0.8, ease: "power4.in" }, "-=0.5")
+          .to(".interface", { opacity: 0, duration: 0.2 }, "-=1")
+          .add(() => {
+              renderer.setClearColor(0xffffff, 1);
+          })
+          .to(core.scale, { x: 10, y: 10, z: 10, duration: 0.1 })
+          .add(() => {
+              renderer.setClearColor(0x000000, 1);
+          }, "+=0.1")
+          .to(core.scale, { x: 1, y: 1, z: 1, duration: 2, ease: "elastic.out(1, 0.3)" })
+          .to(camera.position, { z: 18, duration: 2, ease: "power3.out" }, "-=1.5")
+          .to(".interface", { opacity: 1, duration: 1 });
+
+        this.innerText = "SOVEREIGNTY_ESTABLISHED";
+    });
+
+    window.onload = init;
+</script>
+
+</body>
+</html>
