@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" sizes="16x16" href="/favicon_io/favicon-16x16.png">
+<link rel="apple-touch-icon" href="/favicon_io/apple-touch-icon.png">
+  
+    <title>Opnr | Analog Elegance</title>
+    <style>
+        :root {
+            --phosphor: #00ff66;
+            --bg: #020202;
+            --white: #ffffff;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            overflow: hidden;
+            background-color: var(--bg);
+            color: var(--white);
+            font-family: 'DM Mono', monospace;
+            cursor: none;
+        }
+
+        #canvas-container {
+            position: absolute; inset: 0;
+            z-index: 1;
+            filter: blur(0.4px) contrast(1.2);
+        }
+
+        /* Glass Surface Effect */
+        .crt-glass {
+            position: fixed; inset: 0;
+            z-index: 10;
+            pointer-events: none;
+            background: 
+                radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.5) 100%),
+                repeating-linear-gradient(rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 1px, transparent 1px, transparent 3px);
+            opacity: 0.6;
+        }
+
+        .interface {
+            position: absolute; inset: 0;
+            z-index: 20;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 60px;
+        }
+
+        .header-meta {
+            display: flex; justify-content: space-between;
+            font-size: 9px; letter-spacing: 0.5em;
+            color: var(--phosphor);
+            text-transform: uppercase;
+        }
+
+        .center-ui {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        h1 {
+            font-family: serif;
+            font-style: italic;
+            font-size: 8vw;
+            font-weight: 200;
+            margin: 0;
+            opacity: 0;
+            transition: all 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+            filter: blur(10px);
+        }
+
+        h1.visible {
+            opacity: 0.8;
+            filter: blur(0px);
+            letter-spacing: 0.1em;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            pointer-events: auto;
+        }
+
+        .btn-morph {
+            background: transparent;
+            border: 0.5px solid rgba(255,255,255,0.2);
+            color: var(--white);
+            padding: 12px 24px;
+            font-size: 8px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.4s;
+            margin-left: 10px;
+        }
+
+        .btn-morph:hover {
+            border-color: var(--phosphor);
+            color: var(--phosphor);
+            box-shadow: 0 0 20px rgba(0,255,102,0.2);
+        }
+
+        #custom-cursor {
+            position: fixed;
+            width: 30px; height: 30px;
+            border: 0.5px solid var(--white);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 100;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: difference;
+        }
+    </style>
+</head>
+<body>
+
+<div id="custom-cursor"></div>
+<div class="crt-glass"></div>
+
+<div class="interface">
+    <div class="header-meta">
+        <div>Signal Architecture // v.1.0.4</div>
+        <div id="freq-display">540.22 MHz</div>
+    </div>
+
+    <div class="center-ui">
+        <h1 id="brand-title">Opnr</h1>
+    </div>
+
+    <div class="controls">
+        <div style="font-size: 8px; color: rgba(255,255,255,0.3);">
+            OBJECT_GEOMETRY: <span id="geo-type">NOISE_FIELD</span>
+        </div>
+        <div>
+            <button class="btn-morph" onclick="morphTo('noise')">Static</button>
+            <button class="btn-morph" onclick="morphTo('monolith')">Monolith</button>
+            <button class="btn-morph" onclick="morphTo('torus')">Continuity</button>
+        </div>
+    </div>
+</div>
+
+<canvas id="stage"></canvas>
+
+<script>
+    const canvas = document.getElementById('stage');
+    const ctx = canvas.getContext('2d');
+    const title = document.getElementById('brand-title');
+    const geoDisplay = document.getElementById('geo-type');
+
+    let w, h, particles = [];
+    let mouse = { x: -100, y: -100 };
+    let currentMode = 'noise';
+    let time = 0;
+
+    class Grain {
+        constructor() {
+            this.x = Math.random() * window.innerWidth;
+            this.y = Math.random() * window.innerHeight;
+            this.z = Math.random() * 400 - 200;
+            
+            this.tx = this.x;
+            this.ty = this.y;
+            this.tz = this.z;
+            
+            this.size = Math.random() * 1.5;
+            this.opacity = Math.random() * 0.5 + 0.2;
+        }
+
+        update() {
+            // Morphing Logic
+            if (currentMode === 'noise') {
+                this.tx = Math.random() * w;
+                this.ty = Math.random() * h;
+                this.tz = Math.random() * 200 - 100;
+            } else if (currentMode === 'monolith') {
+                const i = particles.indexOf(this);
+                const row = i % 40;
+                const col = Math.floor(i / 40);
+                this.tx = (w/2 - 100) + row * 5;
+                this.ty = (h/2 - 150) + col * 4;
+                this.tz = Math.sin(time + i * 0.01) * 20;
+            } else if (currentMode === 'torus') {
+                const i = particles.indexOf(this);
+                const angle = (i / particles.length) * Math.PI * 2;
+                const innerAngle = (i % 50) / 50 * Math.PI * 2;
+                const R = 150;
+                const r = 40;
+                this.tx = w/2 + (R + r * Math.cos(innerAngle)) * Math.cos(angle);
+                this.ty = h/2 + (R + r * Math.cos(innerAngle)) * Math.sin(angle);
+                this.tz = r * Math.sin(innerAngle);
+            }
+
+            // Ease to target
+            this.x += (this.tx - this.x) * 0.05;
+            this.y += (this.ty - this.y) * 0.05;
+            this.z += (this.tz - this.z) * 0.05;
+
+            // Mouse Interaction (Distortion)
+            const dx = mouse.x - this.x;
+            const dy = mouse.y - this.y;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            if (dist < 100) {
+                const force = (100 - dist) / 100;
+                this.x -= (dx / dist) * force * 10;
+                this.y -= (dy / dist) * force * 10;
+            }
+        }
+
+        draw() {
+            // Perspective Projection
+            const focalLength = 400;
+            const scale = focalLength / (focalLength + this.z);
+            const px = (this.x - w/2) * scale + w/2;
+            const py = (this.y - h/2) * scale + h/2;
+
+            ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity * scale})`;
+            ctx.fillRect(px, py, this.size * scale, this.size * scale);
+            
+            // Random green phosphor flicker
+            if (Math.random() > 0.999) {
+                ctx.fillStyle = '#00ff66';
+                ctx.fillRect(px, py, this.size * 3, this.size * 3);
+            }
+        }
+    }
+
+    function setup() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+        particles = [];
+        for (let i = 0; i < 2000; i++) {
+            particles.push(new Grain());
+        }
+    }
+
+    function morphTo(mode) {
+        currentMode = mode;
+        geoDisplay.innerText = mode.toUpperCase();
+        if (mode !== 'noise') {
+            title.classList.add('visible');
+        } else {
+            title.classList.remove('visible');
+        }
+    }
+
+    function animate() {
+        time += 0.02;
+        ctx.fillStyle = 'rgba(2, 2, 2, 0.3)'; // Trail effect
+        ctx.fillRect(0, 0, w, h);
+
+        particles.forEach(p => {
+            p.update();
+            p.draw();
+        });
+
+        // Frequency jitter
+        document.getElementById('freq-display').innerText = (540 + Math.random() * 0.5).toFixed(2) + " MHz";
+
+        requestAnimationFrame(animate);
+    }
+
+    window.addEventListener('mousemove', (e) => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+        document.getElementById('custom-cursor').style.left = e.clientX + 'px';
+        document.getElementById('custom-cursor').style.top = e.clientY + 'px';
+    });
+
+    window.addEventListener('resize', setup);
+
+    setup();
+    animate();
+</script>
+
+</body>
+</html>
